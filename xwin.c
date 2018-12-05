@@ -24,6 +24,9 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xproto.h>
+#ifdef HAVE_XFIXES
+#include <X11/extensions/Xfixes.h>
+#endif
 #include <assert.h>
 #include <unistd.h>
 #include <sys/time.h>
@@ -72,6 +75,8 @@ extern char g_seamless_spawn_cmd[];
    As of RDP 5.1, it may be 8, 15, 16 or 24. */
 extern int g_server_depth;
 extern int g_win_button_size;
+
+extern int RREventChangeSelection;
 
 /* This is a timer used to rate limit actual resizing */
 static struct timeval g_resize_timer = { 0 };
@@ -2236,6 +2241,8 @@ ui_create_window(uint32 width, uint32 height)
 		seamless_reset_state();
 		seamless_restack_test();
 	}
+ 
+        xclip_init_selchange();
 
 	return True;
 }
@@ -2295,6 +2302,8 @@ ui_have_window()
 void
 ui_destroy_window(void)
 {
+        xclip_deinit_selchange();
+
 	if (g_IC != NULL)
 		XDestroyIC(g_IC);
 
@@ -2951,6 +2960,13 @@ xwin_process_events(void)
 
 				sw_handle_restack(sw);
 				break;
+                      default:
+#ifdef HAVE_XFIXES
+                        if (xevent.type == RREventChangeSelection+XFixesSelectionNotify)
+                                xclip_handle_SelectionChange();
+#endif
+                                break;
+
 		}
 	}
 	/* Keep going */

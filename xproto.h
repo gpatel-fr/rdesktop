@@ -1,7 +1,10 @@
 void xclip_handle_SelectionNotify(XSelectionEvent * event);
 void xclip_handle_SelectionRequest(XSelectionRequestEvent * xevent);
 void xclip_handle_SelectionClear(void);
+void xclip_handle_SelectionChange(void);
 void xclip_handle_PropertyNotify(XPropertyEvent * xev);
+void xclip_init_selchange(void);
+void xclip_deinit_selchange(void);
 int ewmh_get_window_state(Window w);
 int ewmh_change_state(Window wnd, int state);
 int ewmh_move_to_desktop(Window wnd, unsigned int desktop);

@@ -188,6 +188,17 @@ else
     exit 1
 fi
 
+# Xfixes
+if test -n "$PKG_CONFIG"; then
+    PKG_CHECK_MODULES(XFIXES, xfixes, [HAVE_XFIXES=1], [HAVE_XFIXES=0])
+fi
+if test x"$HAVE_XFIXES" = "x1"; then
+    CFLAGS="$CFLAGS $XFIXES_CFLAGS"
+    LIBS="$LIBS $XFIXES_LIBS"
+    AC_DEFINE(HAVE_XFIXES)
+fi
+
+
 
 dnl Smartcard support
 AC_ARG_ENABLE(smartcard, AS_HELP_STRING([--disable-smartcard], [disable support for smartcard]))

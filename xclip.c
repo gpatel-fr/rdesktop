@@ -22,6 +22,9 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#ifdef HAVE_XFIXES
+#include <X11/extensions/Xfixes.h>
+#endif
 #include "rdesktop.h"
 
 /*
@@ -51,6 +54,9 @@ extern Display *g_display;
 extern Window g_wnd;
 extern Time g_last_gesturetime;
 extern RD_BOOL g_rdpclip;
+
+int RREventChangeSelection;
+int RRErrorChangeSelection;
 
 /* Mode of operation.
    - Auto: Look at both PRIMARY and CLIPBOARD and use the most recent.
@@ -884,6 +890,14 @@ xclip_handle_SelectionClear(void)
 	xclip_probe_selections();
 }
 
+void
+xclip_handle_SelectionChange(void)
+{
+	logger(Clipboard, Debug, "xclip_handle_SelectionChange()");
+	xclip_notify_change();
+	xclip_probe_selections();
+}
+
 /* Called when any property changes in our window or the root window. */
 void
 xclip_handle_PropertyNotify(XPropertyEvent * event)
@@ -1162,6 +1176,23 @@ ui_clip_set_mode(const char *optarg)
 	}
 }
 
+void xclip_init_selchange(void)
+{
+#ifdef HAVE_XFIXES
+        int major = 4, minor = 0;
+        XFixesQueryVersion(g_display, &major, &minor);
+        XFixesQueryExtension(g_display, &RREventChangeSelection, &RRErrorChangeSelection);
+        XFixesSelectSelectionInput(g_display, g_wnd, clipboard_atom, XFixesSetSelectionOwnerNotifyMask | XFixesSelectionWindowDestroyNotifyMask | XFixesSelectionClientCloseNotifyMask);
+#endif
+}
+
+void xclip_deinit_selchange(void)
+{
+#ifdef HAVE_XFIXES
+        XFixesSelectSelectionInput(g_display, g_wnd, clipboard_atom, 0);
+#endif
+}
+
 void
 xclip_init(void)
 {
@@ -1221,3 +1252,4 @@ xclip_deinit(void)
 		XSetSelectionOwner(g_display, clipboard_atom, None, acquire_time);
 	xclip_notify_change();
 }
+
