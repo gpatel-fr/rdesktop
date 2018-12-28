@@ -119,7 +119,7 @@ parallel_close(RD_NTHANDLE handle)
 }
 
 static RD_NTSTATUS
-parallel_read(RD_NTHANDLE handle, uint8 * data, uint32 length, uint32 offset, uint32 * result)
+parallel_read(RD_NTHANDLE handle, uint8 * data, uint32 length, unsigned long offset, uint32 * result)
 {
 	UNUSED(offset);
 	*result = read(handle, data, length);
@@ -127,7 +127,7 @@ parallel_read(RD_NTHANDLE handle, uint8 * data, uint32 length, uint32 offset, ui
 }
 
 static RD_NTSTATUS
-parallel_write(RD_NTHANDLE handle, uint8 * data, uint32 length, uint32 offset, uint32 * result)
+parallel_write(RD_NTHANDLE handle, uint8 * data, uint32 length, unsigned long offset, uint32 * result)
 {
 	UNUSED(offset);
 	int rc = RD_STATUS_SUCCESS;

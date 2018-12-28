@@ -144,7 +144,7 @@ printer_close(RD_NTHANDLE handle)
 }
 
 static RD_NTSTATUS
-printer_write(RD_NTHANDLE handle, uint8 * data, uint32 length, uint32 offset, uint32 * result)
+printer_write(RD_NTHANDLE handle, uint8 * data, uint32 length, unsigned long offset, uint32 * result)
 {
 	UNUSED(offset);
 	PRINTER *pprinter_data;

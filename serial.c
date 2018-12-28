@@ -628,7 +628,7 @@ serial_close(RD_NTHANDLE handle)
 }
 
 static RD_NTSTATUS
-serial_read(RD_NTHANDLE handle, uint8 * data, uint32 length, uint32 offset, uint32 * result)
+serial_read(RD_NTHANDLE handle, uint8 * data, uint32 length, unsigned long offset, uint32 * result)
 {
 	UNUSED(offset);
 	long timeout;
@@ -684,7 +684,7 @@ serial_read(RD_NTHANDLE handle, uint8 * data, uint32 length, uint32 offset, uint
 }
 
 static RD_NTSTATUS
-serial_write(RD_NTHANDLE handle, uint8 * data, uint32 length, uint32 offset, uint32 * result)
+serial_write(RD_NTHANDLE handle, uint8 * data, uint32 length, unsigned long offset, uint32 * result)
 {
 	UNUSED(offset);
 	SERIAL_DEVICE *pser_inf;

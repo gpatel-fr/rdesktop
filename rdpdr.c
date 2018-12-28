@@ -86,7 +86,8 @@ char *g_rdpdr_clientname = NULL;
 /* if multiple IOs are being done on the same FD */
 struct async_iorequest
 {
-	uint32 fd, major, minor, offset, device, id, length, partial_len;
+	uint32 fd, major, minor, device, id, length, partial_len;
+        unsigned long offset;
 	long timeout,		/* Total timeout */
 	  itv_timeout;		/* Interval timeout (between serial characters) */
 	uint8 *buffer;
@@ -146,7 +147,7 @@ rdpdr_handle_ok(uint32 device, RD_NTHANDLE handle)
 static RD_BOOL
 add_async_iorequest(uint32 device, uint32 file, uint32 id, uint32 major, uint32 length,
 		    DEVICE_FNS * fns, uint32 total_timeout, uint32 interval_timeout, uint8 * buffer,
-		    uint32 offset)
+		    unsigned long offset)
 {
 	struct async_iorequest *iorq;
 
@@ -399,9 +400,9 @@ rdpdr_process_irp(STREAM s)
 		major,
 		minor,
 		device,
-		offset,
 		bytes_out,
 		share_mode, disposition, total_timeout, interval_timeout, flags_and_attributes = 0;
+        unsigned long offset;
 
 	char *filename;
 	uint32 filename_len;
@@ -524,10 +525,10 @@ rdpdr_process_irp(STREAM s)
 			}
 
 			in_uint32_le(s, length);
-			in_uint32_le(s, offset);
+			in_uint64_le(s, offset);
 
 			logger(Protocol, Debug,
-			       "rdpdr_process_irp(), IRP Read length=%d, offset=%d", length,
+			       "rdpdr_process_irp(), IRP Read length=%d, offset=%ld", length,
 			       offset);
 
 			if (!rdpdr_handle_ok(device, file))
@@ -578,10 +579,10 @@ rdpdr_process_irp(STREAM s)
 			}
 
 			in_uint32_le(s, length);
-			in_uint32_le(s, offset);
-			in_uint8s(s, 0x18);
+			in_uint64_le(s, offset);
+			in_uint8s(s, 0x14);
 
-			logger(Protocol, Debug, "rdpdr_process_irp(), IRP Write length=%d", result);
+			logger(Protocol, Debug, "rdpdr_process_irp(), IRP Write length=%d offset=%ld", length, offset);
 
 			if (!rdpdr_handle_ok(device, file))
 			{
